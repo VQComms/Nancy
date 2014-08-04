@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-namespace Nancy.Metadata.Module
+﻿namespace Nancy.Metadata.Module
 {
+    using System.Collections.Generic;
+
     public interface IMetadataConvention
     {
         bool CanUseModule(INancyModule module, IEnumerable<IMetadataModule> metadataModules);

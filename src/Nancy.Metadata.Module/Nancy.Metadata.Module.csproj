@@ -69,7 +69,6 @@
     <Compile Include="IMetadataConvention.cs" />
     <Compile Include="IMetadataModule.cs" />
     <Compile Include="IMetadataModuleResolver.cs" />
-    <Compile Include="DefaultMetadataModuleConventions.cs" />
     <Compile Include="MetadataModule.cs" />
     <Compile Include="MetadataModuleRegistrations.cs" />
     <Compile Include="MetadataModuleRouteMetadataProvider.cs" />
