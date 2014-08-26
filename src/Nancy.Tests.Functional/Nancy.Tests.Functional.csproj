@@ -88,6 +88,7 @@
     <Compile Include="Modules\JsonpTestModule.cs" />
     <Compile Include="Modules\RazorTestModule.cs" />
     <Compile Include="Modules\SerializerTestModule.cs" />
+    <Compile Include="Modules\StatusCodeHandlerModule.cs" />
     <Compile Include="Tests\AbsoluteUrlTests.cs" />
     <Compile Include="Tests\AsyncExceptionTests.cs" />
     <Compile Include="Tests\BasicRouteInvocationsFixture.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Tests\MethodRewriteFixture.cs" />
     <Compile Include="Tests\PerRouteAuthFixture.cs" />
     <Compile Include="Tests\SerializerTests.cs" />
+    <Compile Include="Tests\StatusCodeHandlerFixture.cs" />
     <Compile Include="Tests\TracingSmokeTests.cs" />
     <Compile Include="Tests\JsonpTests.cs" />
     <Compile Include="Tests\ModelBindingTests.cs" />
