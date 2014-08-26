@@ -88,7 +88,6 @@
     <Compile Include="Modules\JsonpTestModule.cs" />
     <Compile Include="Modules\RazorTestModule.cs" />
     <Compile Include="Modules\SerializerTestModule.cs" />
-    <Compile Include="Modules\StatusCodeHandlerModule.cs" />
     <Compile Include="Tests\AbsoluteUrlTests.cs" />
     <Compile Include="Tests\AsyncExceptionTests.cs" />
     <Compile Include="Tests\BasicRouteInvocationsFixture.cs" />
