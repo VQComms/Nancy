@@ -15,7 +15,7 @@ namespace Nancy.Diagnostics
 
         public static byte[] GenerateRandomSalt()
         {
-#if DNXCORE50
+#if DOTNET5_4
             var provider = RandomNumberGenerator.Create();
 #else
             var provider = new RNGCryptoServiceProvider();

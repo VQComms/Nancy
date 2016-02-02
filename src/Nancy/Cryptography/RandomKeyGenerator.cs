@@ -7,7 +7,7 @@ namespace Nancy.Cryptography
     /// </summary>
     public class RandomKeyGenerator : IKeyGenerator
     {
-#if DNXCORE50
+#if DOTNET5_4
         private readonly RandomNumberGenerator provider = RandomNumberGenerator.Create();
 #else 
         private readonly RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();

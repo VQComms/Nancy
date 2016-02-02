@@ -8,7 +8,7 @@
 
     public static class CsrfTokenExtensions
     {
-#if DNXCORE50
+#if DOTNET5_4
         private static readonly RandomNumberGenerator randomGenerator = RandomNumberGenerator.Create();
 #else
         private static readonly RandomNumberGenerator randomGenerator = new RNGCryptoServiceProvider();
