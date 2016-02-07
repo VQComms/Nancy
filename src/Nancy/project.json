@@ -20,7 +20,6 @@
         "Diagnostics/Resources/**/*.*",
         "Diagnostics/Views/**/*.*"
     ],
-
     "frameworks": {
         "dotnet5.4": {
           "dependencies": {
@@ -38,7 +37,7 @@
             "System.Net.NameResolution": "4.0.0-beta-23516",
             "System.Net.Primitives": "4.0.11-beta-23516",
             "System.Reflection.TypeExtensions": "4.1.0-beta-23516",
-            "System.Reflection.Extensions" : "4.0.1-beta-23516",
+            "System.Reflection.Extensions": "4.0.1-beta-23516",
             "System.Runtime": "4.0.21-beta-23516",
             "System.Runtime.Serialization.Primitives": "4.1.0-beta-23516",
             "System.Security.Claims": "4.0.1-beta-23516",
