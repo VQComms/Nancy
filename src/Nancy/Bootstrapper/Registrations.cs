@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+
     using Nancy.Extensions;
 
     /// <summary>
@@ -174,7 +175,7 @@
         {
             var implementations = this.typeCatalog
                 .GetTypesAssignableTo<TRegistration>()
-                .Where(type => type.GetAssembly() != this.GetType().GetTypeInfo().Assembly)
+                .Where(type => type.Assembly() != this.GetType().GetTypeInfo().Assembly)
                 .Where(type => !defaultImplementations.Contains(type))
                 .ToList();
 
@@ -201,7 +202,7 @@
         {
             var implementations = this.typeCatalog
                 .GetTypesAssignableTo<TRegistration>()
-                .Where(type => type.GetAssembly() != this.GetType().GetTypeInfo().Assembly)
+                .Where(type => type.Assembly() != this.GetType().GetTypeInfo().Assembly)
                 .Where(type => !defaultImplementations.Contains(type))
                 .ToList();
 

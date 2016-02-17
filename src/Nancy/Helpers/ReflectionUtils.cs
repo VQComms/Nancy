@@ -50,9 +50,7 @@ namespace Nancy.Helpers
         public static bool HasDefaultConstructor(Type t)
         {
             if (t == null)
-            {
                 throw new ArgumentNullException("t");
-            }
 #if DOTNET5_4
             return (t.GetConstructor(Type.EmptyTypes) != null);
 #else
@@ -64,19 +62,13 @@ namespace Nancy.Helpers
         public static bool IsAssignable(Type to, Type from)
         {
             if (to == null)
-            {
                 throw new ArgumentNullException("to");
-            }
 
             if (to.IsAssignableFrom(from))
-            {
                 return true;
-            }
 
             if (to.GetTypeInfo().IsGenericType && from.GetTypeInfo().IsGenericTypeDefinition)
-            {
                 return to.IsAssignableFrom(from.MakeGenericType(to.GetGenericArguments()));
-            }
 
             return false;
         }
@@ -84,14 +76,10 @@ namespace Nancy.Helpers
         public static bool IsSubClass(Type type, Type check)
         {
             if (type == null || check == null)
-            {
                 return false;
-            }
 
             if (type == check)
-            {
                 return true;
-            }
 
             if (check.GetTypeInfo().IsInterface)
             {
@@ -108,8 +96,6 @@ namespace Nancy.Helpers
             return IsSubClass(type.GetTypeInfo().BaseType, check);
         }
 
-        static readonly Type GenericListType = typeof(List<>);
-
         /// <summary>
         /// Gets the type of the typed list's items.
         /// </summary>
@@ -122,60 +108,41 @@ namespace Nancy.Helpers
 
             if (type.IsArray)
                 return type.GetElementType();
-            else if (type.GetTypeInfo().IsGenericType
-                         && GenericListType.IsAssignableFrom(type.GetGenericTypeDefinition()))
-            {
+            else if (type.GetTypeInfo().IsGenericType && typeof(List<>).IsAssignableFrom(type.GetGenericTypeDefinition()))
                 return type.GetGenericArguments()[0];
-            }
             else
-            {
                 throw new Exception("Bad type");
-            }
         }
 
         public static Type GetTypedDictionaryValueType(Type type)
         {
             if (type == null)
-            {
                 throw new ArgumentNullException("type");
-            }
 
-            var genDictType = GetGenericDictionary(type);
+            Type genDictType = GetGenericDictionary(type);
 
             if (genDictType != null)
-            {
                 return genDictType.GetGenericArguments()[1];
-            }
             else if (typeof(IDictionary).IsAssignableFrom(type))
-            {
                 return null;
-            }
             else
-            {
                 throw new Exception("Bad type");
-            }
         }
 
         static readonly Type GenericDictionaryType = typeof(IDictionary<,>);
-
         public static Type GetGenericDictionary(Type type)
         {
-            if (type.GetTypeInfo().IsGenericType
-                && GenericDictionaryType.IsAssignableFrom(type.GetGenericTypeDefinition()))
-            {
+            if (type.GetTypeInfo().IsGenericType && GenericDictionaryType.IsAssignableFrom(type.GetGenericTypeDefinition()))
                 return type;
-            }
 
-            var ifaces = type.GetInterfaces();
+            Type[] ifaces = type.GetInterfaces();
             if (ifaces != null)
-            {
                 for (int i = 0; i < ifaces.Length; i++)
                 {
                     Type current = GetGenericDictionary(ifaces[i]);
                     if (current != null)
                         return current;
                 }
-            }
 
             return null;
         }
@@ -211,20 +178,14 @@ namespace Nancy.Helpers
         public static bool IsIndexedProperty(MemberInfo member)
         {
             if (member == null)
-            {
                 throw new ArgumentNullException("member");
-            }
 
-            var propertyInfo = member as PropertyInfo;
+            PropertyInfo propertyInfo = member as PropertyInfo;
 
             if (propertyInfo != null)
-            {
                 return IsIndexedProperty(propertyInfo);
-            }
             else
-            {
                 return false;
-            }
         }
 
         /// <summary>
@@ -237,9 +198,7 @@ namespace Nancy.Helpers
         public static bool IsIndexedProperty(PropertyInfo property)
         {
             if (property == null)
-            {
                 throw new ArgumentNullException("property");
-            }
 
             return (property.GetIndexParameters().Length > 0);
         }
@@ -300,7 +259,7 @@ namespace Nancy.Helpers
         /// </returns>
         public static bool CanReadMemberValue(MemberInfo member)
         {
-            if (member is FieldInfo)
+            if(member is FieldInfo)
             {
                 return true;
             }
@@ -336,14 +295,10 @@ namespace Nancy.Helpers
 
             MemberInfo[] members = type.GetFields(bindingAttr);
             for (int i = 0; i < members.Length; i++)
-            {
                 yield return members[i];
-            }
             members = type.GetProperties(bindingAttr);
             for (int i = 0; i < members.Length; i++)
-            {
                 yield return members[i];
-            }
         }
     }
 }

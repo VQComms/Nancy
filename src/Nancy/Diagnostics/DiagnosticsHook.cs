@@ -19,7 +19,6 @@ namespace Nancy.Diagnostics
     using Nancy.Routing;
     using Nancy.Routing.Constraints;
     using Nancy.Routing.Trie;
-
     /// <summary>
     /// Pipeline hook to handle diagnostics dashboard requests.
     /// </summary>

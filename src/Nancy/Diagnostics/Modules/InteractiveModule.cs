@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Reflection;
     using Nancy.Helpers;
-
+    using System.Reflection;
     public class InteractiveModule : DiagnosticModule
     {
         private readonly IInteractiveDiagnostics interactiveDiagnostics;

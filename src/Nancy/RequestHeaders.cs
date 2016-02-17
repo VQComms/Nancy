@@ -9,7 +9,6 @@ namespace Nancy
     using System.Reflection;
     using Nancy.Cookies;
 
-
     /// <summary>
     /// Provides strongly-typed access to HTTP request headers.
     /// </summary>

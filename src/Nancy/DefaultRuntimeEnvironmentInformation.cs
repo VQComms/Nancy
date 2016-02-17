@@ -34,7 +34,22 @@ namespace Nancy
         {
             try
             {
-                return Debugger.IsAttached;
+                var assembliesInDebug = typeCatalog
+                    .GetTypesAssignableTo<INancyModule>(TypeResolveStrategies.ExcludeNancy)
+#if DOTNET5_4
+                    .Select(x => x.GetTypeInfo().Assembly.GetCustomAttributes(typeof(DebuggableAttribute)))
+                    .Where(x => x.Any());
+
+                    return assembliesInDebug.Any(d => ((DebuggableAttribute)d.First()).IsJITTrackingEnabled);
+#else
+                    .Select(x => x.Assembly.GetCustomAttributes(typeof(DebuggableAttribute), true))
+                    .Where(x => x.Length != 0);
+                    
+                    return assembliesInDebug.Any(d => ((DebuggableAttribute)d[0]).IsJITTrackingEnabled);
+#endif
+
+
+
             }
             catch
             {

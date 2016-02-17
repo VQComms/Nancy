@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    
     /// <summary>
     /// Containing extensions for the <see cref="Type"/> object.
     /// </summary>
@@ -16,7 +15,7 @@
         /// </summary>
         /// <param name="source"></param>
         /// <returns> The assembly that contains the type </returns>
-        public static Assembly GetAssembly(this Type source)
+        public static Assembly Assembly(this Type source)
         {
             return source.GetTypeInfo().Assembly;
         }
