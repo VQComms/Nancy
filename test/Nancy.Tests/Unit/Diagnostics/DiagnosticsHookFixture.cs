@@ -21,7 +21,14 @@
         public DiagnosticsHookFixture()
         {
             this.cryptoConfig = CryptographyConfiguration.Default;
-            this.objectSerializer = new DefaultObjectSerializer();
+            var fakeAssemblyCatalog = A.Fake<IAssemblyCatalog>();
+            A.CallTo(() => fakeAssemblyCatalog.GetAssemblies(AssemblyResolveStrategies.All))
+                .Returns(new[]
+                {
+                    typeof(DiagnosticsHookFixture).GetTypeInfo().Assembly,
+                    typeof(DiagnosticsSession).GetTypeInfo().Assembly
+                });
+            this.objectSerializer = new DefaultObjectSerializer(fakeAssemblyCatalog);
         }
 
 #if DEBUG

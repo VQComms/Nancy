@@ -63,10 +63,6 @@ namespace Nancy
                 {
                     return SimpleJson.DeserializeObject(json);
                 }
-
-                dynamic serializedObject = SimpleJson.DeserializeObject(json);
-
-                return SimpleJson.DeserializeObject(json, Type.GetType(serializedObject.TypeObject));
             }
             catch (FormatException)
             {

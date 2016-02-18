@@ -30,6 +30,8 @@ namespace Nancy.Tests.Unit.Sessions
         private readonly DefaultHmacProvider defaultHmacProvider;
         private readonly IObjectSerializer defaultObjectSerializer;
 
+        private IAssemblyCatalog assemblyCatalog;
+
         public CookieBasedSessionsFixture()
         {
             this.fakeEncryptionProvider = A.Fake<IEncryptionProvider>();
@@ -39,7 +41,10 @@ namespace Nancy.Tests.Unit.Sessions
 
             this.aesEncryptionProvider = new AesEncryptionProvider(new PassphraseKeyGenerator("password", new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 }, 1000));
             this.defaultHmacProvider = new DefaultHmacProvider(new PassphraseKeyGenerator("anotherpassword", new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 }, 1000));
-            this.defaultObjectSerializer = new DefaultObjectSerializer();
+            this.assemblyCatalog = A.Fake<IAssemblyCatalog>();
+            A.CallTo(() => this.assemblyCatalog.GetAssemblies(AssemblyResolveStrategies.All))
+                .Returns(new[] { typeof(CookieBasedSessionsFixture).GetTypeInfo().Assembly });
+            this.defaultObjectSerializer = new DefaultObjectSerializer(this.assemblyCatalog);
         }
 
         [Fact]
@@ -183,7 +188,7 @@ namespace Nancy.Tests.Unit.Sessions
             A.CallTo(() => hooks.BeforeRequest).Returns(beforePipeline);
             A.CallTo(() => hooks.AfterRequest).Returns(afterPipeline);
 
-            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider));
+            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider), this.assemblyCatalog);
 
             beforePipeline.PipelineDelegates.Count().ShouldEqual(1);
             afterPipeline.PipelineItems.Count().ShouldEqual(1);
@@ -197,7 +202,7 @@ namespace Nancy.Tests.Unit.Sessions
             var hooks = A.Fake<IPipelines>();
             A.CallTo(() => hooks.BeforeRequest).Returns(beforePipeline);
             A.CallTo(() => hooks.AfterRequest).Returns(afterPipeline);
-            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider)).WithSerializer(this.fakeObjectSerializer);
+            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider), this.assemblyCatalog).WithSerializer(this.fakeObjectSerializer);
             var request = CreateRequest("encryptedkey1=value1");
             A.CallTo(() => this.fakeEncryptionProvider.Decrypt("encryptedkey1=value1")).Returns("key1=value1;");
             var response = A.Fake<Response>();
@@ -217,7 +222,7 @@ namespace Nancy.Tests.Unit.Sessions
             var hooks = A.Fake<IPipelines>();
             A.CallTo(() => hooks.BeforeRequest).Returns(beforePipeline);
             A.CallTo(() => hooks.AfterRequest).Returns(afterPipeline);
-            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider)).WithSerializer(this.fakeObjectSerializer);
+            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider), this.assemblyCatalog).WithSerializer(this.fakeObjectSerializer);
             var request = CreateRequest("encryptedkey1=value1");
             A.CallTo(() => this.fakeEncryptionProvider.Decrypt("encryptedkey1=value1")).Returns("key1=value1;");
             var response = A.Fake<Response>();
@@ -267,7 +272,7 @@ namespace Nancy.Tests.Unit.Sessions
             A.CallTo(() => hooks.AfterRequest).Returns(afterPipeline);
             var fakeFormatter = A.Fake<IObjectSerializer>();
             A.CallTo(() => this.fakeEncryptionProvider.Decrypt("encryptedkey1=value1")).Returns("key1=value1;");
-            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider)).WithSerializer(fakeFormatter);
+            CookieBasedSessions.Enable(hooks, new CryptographyConfiguration(this.fakeEncryptionProvider, this.fakeHmacProvider), this.assemblyCatalog).WithSerializer(fakeFormatter);
             var request = CreateRequest("encryptedkey1=value1");
             var nancyContext = new NancyContext() { Request = request };
 
