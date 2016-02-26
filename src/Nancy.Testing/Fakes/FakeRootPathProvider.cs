@@ -20,7 +20,7 @@ namespace Nancy.Testing.Fakes
         {
             var assembly = Assembly.GetEntryAssembly();
 
-            rootPath = assembly == null ? Environment.CurrentDirectory : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            rootPath = assembly == null ? Directory.GetCurrentDirectory() : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         }
 
         /// <summary>

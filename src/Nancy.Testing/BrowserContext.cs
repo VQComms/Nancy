@@ -5,6 +5,7 @@
     using System.IO;
     using System.Reflection;
     using System.Security.Cryptography.X509Certificates;
+    using System.Text;
     using Configuration;
     using Nancy.Helpers;
 
@@ -202,19 +203,24 @@
         /// </summary>
         public void Certificate()
         {
-            X509Certificate2 certificate2;
+            var cert = @"-----BEGIN CERTIFICATE-----
+                            MIICNTCCAZ4CCQC21XwOAYG32zANBgkqhkiG9w0BAQUFADBfMQswCQYDVQQGEwJH
+                            QjETMBEGA1UECBMKU29tZS1TdGF0ZTEOMAwGA1UEChMFTmFuY3kxDjAMBgNVBAsT
+                            BU5hbmN5MRswGQYDVQQDExJodHRwOi8vbmFuY3lmeC5vcmcwHhcNMTYwMjIyMTE1
+                            NzQ3WhcNMTcwMjIxMTE1NzQ3WjBfMQswCQYDVQQGEwJHQjETMBEGA1UECBMKU29t
+                            ZS1TdGF0ZTEOMAwGA1UEChMFTmFuY3kxDjAMBgNVBAsTBU5hbmN5MRswGQYDVQQD
+                            ExJodHRwOi8vbmFuY3lmeC5vcmcwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGB
+                            AMT4vOtIH9Fzad+8KCGjMPkkVpCtn+L5H97bnI3x+y3x5lY0WRsK8FyxVshY/7fv
+                            TDeeVKUWanmbMkQjgFRYffA3ep3/AIguswYdANiNVHrx0L7DXNDcgsjRwaa6JVgQ
+                            9iavlli0a80AF67FN1wfidlHCX53u3/fAjiSTwf7D+NBAgMBAAEwDQYJKoZIhvcN
+                            AQEFBQADgYEAh12A4NntHHdVMGaw+2umXkWqCOyAPuNhyBGUHK5vGON+VG0HPFaf
+                            8P8eMtdF4deBHkrfoWxRuGGn2tJzNpZLiEf23BAivEf36IqwfkVP7/zDwI+bjVXC
+                            k64Un2uN8ALR/wLwfJzHfOLPtsca7ySWhlv8oZo2nk0vR34asQiGJDQ=
+                            -----END CERTIFICATE-----
+                            ";
 
-            using (
-                var pkcs12 =
-                    Assembly.GetAssembly(typeof (BrowserContext))
-                            .GetManifestResourceStream("Nancy.Testing.Resources.Nancy Testing Cert.pfx"))
-            {
-                using (var br = new BinaryReader(pkcs12))
-                {
-                    certificate2 = new X509Certificate2(br.ReadBytes((int)pkcs12.Length), "nancy",
-                                                        X509KeyStorageFlags.Exportable);
-                }
-            }
+            byte[] embeddedCert = Encoding.UTF8.GetBytes(cert);
+            var certificate2 = new X509Certificate2(embeddedCert);
 
             this.Values.ClientCertificate = certificate2;
         }
