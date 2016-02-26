@@ -49,23 +49,7 @@
             })))
             {
                 // When
-                var cert = @"-----BEGIN CERTIFICATE-----
-                            MIICNTCCAZ4CCQC21XwOAYG32zANBgkqhkiG9w0BAQUFADBfMQswCQYDVQQGEwJH
-                            QjETMBEGA1UECBMKU29tZS1TdGF0ZTEOMAwGA1UEChMFTmFuY3kxDjAMBgNVBAsT
-                            BU5hbmN5MRswGQYDVQQDExJodHRwOi8vbmFuY3lmeC5vcmcwHhcNMTYwMjIyMTE1
-                            NzQ3WhcNMTcwMjIxMTE1NzQ3WjBfMQswCQYDVQQGEwJHQjETMBEGA1UECBMKU29t
-                            ZS1TdGF0ZTEOMAwGA1UEChMFTmFuY3kxDjAMBgNVBAsTBU5hbmN5MRswGQYDVQQD
-                            ExJodHRwOi8vbmFuY3lmeC5vcmcwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGB
-                            AMT4vOtIH9Fzad+8KCGjMPkkVpCtn+L5H97bnI3x+y3x5lY0WRsK8FyxVshY/7fv
-                            TDeeVKUWanmbMkQjgFRYffA3ep3/AIguswYdANiNVHrx0L7DXNDcgsjRwaa6JVgQ
-                            9iavlli0a80AF67FN1wfidlHCX53u3/fAjiSTwf7D+NBAgMBAAEwDQYJKoZIhvcN
-                            AQEFBQADgYEAh12A4NntHHdVMGaw+2umXkWqCOyAPuNhyBGUHK5vGON+VG0HPFaf
-                            8P8eMtdF4deBHkrfoWxRuGGn2tJzNpZLiEf23BAivEf36IqwfkVP7/zDwI+bjVXC
-                            k64Un2uN8ALR/wLwfJzHfOLPtsca7ySWhlv8oZo2nk0vR34asQiGJDQ=
-                            -----END CERTIFICATE-----
-                            ";
-
-                byte[] embeddedCert = Encoding.UTF8.GetBytes(cert);
+                var cert = File.ReadAllBytes("Resources\\NancyCert.crt");
 
                 var env = new Dictionary<string, object>()
                 {
@@ -73,7 +57,7 @@
                     { "owin.RequestScheme", "http" },
                     { "owin.RequestHeaders", new Dictionary<string, string[]>() { { "Host", new[] { "localhost" } } } },
                     { "owin.RequestMethod", "GET" },
-                    {"ssl.ClientCertificate", new X509Certificate(embeddedCert) }
+                    {"ssl.ClientCertificate", new X509Certificate(cert) }
                 };
                 server.Invoke(env);
 
