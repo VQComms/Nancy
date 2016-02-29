@@ -9,9 +9,9 @@
     "iconUrl": "http://nancyfx.org/nancy-nuget.png",
 
     "dependencies": {
+        "AngleSharp": "0.9.4",
         "Nancy": { "target": "project" },
-        "Nancy.Authentication.Forms": { "target": "project" },
-        "CsQuery": "1.3.3"
+        "Nancy.Authentication.Forms": { "target": "project" }
     },
 
     "resource": [
