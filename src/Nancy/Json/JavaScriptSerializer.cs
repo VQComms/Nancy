@@ -39,6 +39,8 @@ namespace Nancy.Json
     /// </summary>
     public class JavaScriptSerializer
     {
+        private readonly JsonConfiguration jsonConfiguration;
+
         private readonly NancySerializationStrategy serializerStrategy;
 
         /// <summary>
@@ -51,22 +53,24 @@ namespace Nancy.Json
         /// <summary>
         /// Creates an instance of <see cref="JavaScriptSerializer"/>
         /// </summary>
-        /// <param name="configuration">A <see cref="JsonConfiguration"/> object to configure the serializer</param>
-        public JavaScriptSerializer(JsonConfiguration configuration)
+        /// <param name="jsonConfiguration">A <see cref="JsonConfiguration"/> object to configure the serializer</param>
+        public JavaScriptSerializer(JsonConfiguration jsonConfiguration)
         {
-            this.serializerStrategy = new NancySerializationStrategy(configuration.RetainCasing);
+            this.jsonConfiguration = jsonConfiguration;
+            this.serializerStrategy = new NancySerializationStrategy(jsonConfiguration.RetainCasing);
         }
 
         /// <summary>
         /// Creates an instance of <see cref="JavaScriptSerializer"/>
         /// </summary>
-        /// <param name="configuration">A <see cref="JsonConfiguration"/> object to configure the serializer</param>
+        /// <param name="jsonConfiguration">A <see cref="JsonConfiguration"/> object to configure the serializer</param>
         /// <param name="registerConverters">A boolean to determine whether to register custom converters</param>
-        public JavaScriptSerializer(JsonConfiguration configuration, bool registerConverters) : this(configuration)
+        public JavaScriptSerializer(JsonConfiguration jsonConfiguration, bool registerConverters) : this(jsonConfiguration)
         {
+            this.jsonConfiguration = jsonConfiguration;
             if (registerConverters)
             {
-                this.RegisterConverters(configuration.Converters, configuration.PrimitiveConverters);
+                this.RegisterConverters(jsonConfiguration.Converters, jsonConfiguration.PrimitiveConverters);
             }
         }
 
@@ -78,7 +82,7 @@ namespace Nancy.Json
         /// <returns>An instance of type <typeparamref name="T"/> representing <paramref name="input"/> as an object</returns>
         public T Deserialize<T>(string input)
         {
-            return SimpleJson.DeserializeObject<T>(input, this.serializerStrategy);
+            return SimpleJson.DeserializeObject<T>(input, this.serializerStrategy, this.jsonConfiguration.DateTimeStyleConversion);
         }
 
         /// <summary>
@@ -88,7 +92,7 @@ namespace Nancy.Json
         /// <returns>An object representing <paramref name="input"/></returns>
         public object DeserializeObject(string input)
         {
-            return SimpleJson.DeserializeObject(input, null, this.serializerStrategy);
+            return SimpleJson.DeserializeObject(input, null, this.serializerStrategy, this.jsonConfiguration.DateTimeStyleConversion);
         }
 
         /// <summary>

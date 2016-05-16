@@ -2,6 +2,7 @@
 {
     using System;
     using System.Globalization;
+    using Nancy.Extensions;
     using Nancy.ModelBinding;
 
     public class SerializerTestModule : NancyModule

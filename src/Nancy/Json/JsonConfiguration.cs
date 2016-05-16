@@ -1,6 +1,8 @@
 namespace Nancy.Json
 {
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Text;
     using Nancy.Json.Converters;
 
@@ -17,7 +19,8 @@ namespace Nancy.Json
             Converters = new List<JavaScriptConverter> { new TimeSpanConverter(), new TupleConverter() },
             DefaultEncoding = Encoding.UTF8,
             PrimitiveConverters = new List<JavaScriptPrimitiveConverter>(),
-            RetainCasing = false
+            RetainCasing = false,
+            DateTimeStyleConversion = DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal
         };
 
         private JsonConfiguration()
@@ -31,12 +34,14 @@ namespace Nancy.Json
         /// <param name="converters">List of <see cref="JavaScriptConverter"/> instances.</param>
         /// <param name="primitiveConverters">List of <see cref="JavaScriptPrimitiveConverter"/> instances.</param>
         /// <param name="retainCasing"><see langword="true"/> if the name casing should be retained during serialization, otherwise <see langword="false"/>.</param>
-        public JsonConfiguration(Encoding defaultEncoding, IList<JavaScriptConverter> converters, IList<JavaScriptPrimitiveConverter> primitiveConverters, bool? retainCasing)
+        /// <param name="dateTimeStyleConversion">The default <see cref="DateTimeStyles"/> used to convert incoming <see cref="DateTime"/> and <see cref="DateTimeOffset"/></param>
+        public JsonConfiguration(Encoding defaultEncoding, IList<JavaScriptConverter> converters, IList<JavaScriptPrimitiveConverter> primitiveConverters, bool? retainCasing, DateTimeStyles? dateTimeStyleConversion)
         {
             this.DefaultEncoding = defaultEncoding ?? Default.DefaultEncoding;
             this.Converters = converters ?? Default.Converters;
             this.PrimitiveConverters = primitiveConverters ?? Default.PrimitiveConverters;
             this.RetainCasing = retainCasing ?? Default.RetainCasing;
+            this.DateTimeStyleConversion = dateTimeStyleConversion ?? Default.DateTimeStyleConversion;
         }
 
         /// <summary>
@@ -62,5 +67,10 @@ namespace Nancy.Json
         /// </summary>
         /// <remarks>The default is <see langword="false"/>.</remarks>
         public bool RetainCasing { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DateTimeStyles"/> to convert incoming <see cref="DateTime"/> and <see cref="DateTimeOffset"/>
+        /// </summary>
+        public DateTimeStyles DateTimeStyleConversion { get; private set; }
     }
 }
