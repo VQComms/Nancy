@@ -15,6 +15,7 @@ SCRIPT_ARGUMENTS=()
 # Parse arguments.
 for i in "$@"; do
     case $1 in
+        --target ) TARGET="$2"; shift ;;
         -s|--script) SCRIPT_NAME="$2"; shift ;;
         -v|--verbosity) VERBOSITY="$2"; shift ;;
         -d|--dryrun) DRYRUN="-dryrun" ;;
@@ -30,8 +31,8 @@ function installdotnet() {
     then
       echo "Installing dotnet"
       apt-get install curl
-      curl -sSL https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0-preview1/scripts/obtain/dotnet-install.sh | bash /dev/stdin --version 1.0.0-preview1-002702 --install-dir ~/dotnet
-      ln -s ~/dotnet/dotnet /usr/local/bin
+      curl -sSL https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh | bash /dev/stdin --channel beta --version 1.0.0-preview1-002702 --install-dir .dotnet
+      ln -s .dotnet/dotnet /usr/local/bin
   fi
 }
 
