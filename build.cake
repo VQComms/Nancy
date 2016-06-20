@@ -1,3 +1,5 @@
+#addin "Cake.Json"
+
 // Usings
 using System.Xml;
 using System.Xml.Linq;
@@ -13,9 +15,7 @@ var skipTests = Argument<bool>("skiptests", false);
 
 // Variables
 var configuration = IsRunningOnWindows() ? "Release" : "MonoRelease";
-var solution = File("./Nancy.sln");
-var sharedAssemblyInfo = File("./SharedAssemblyInfo.cs");
-var nancyVersion = "0.0.0.0";
+var projectJsonFiles = GetFiles("./src/**/project.json");
 
 // Directories
 var output = Directory("build");
@@ -24,16 +24,6 @@ var outputBinariesNet452 = outputBinaries + Directory("net452");
 var outputBinariesNetstandard = outputBinaries + Directory("netstandard1.5");
 var outputPackages = output + Directory("packages");
 var outputNuGet = output + Directory("nuget");
-
-///////////////////////////////////////////////////////////////
-
-Setup(context =>
-{
-  // Parse the Nancy version.
-  var assemblyInfo = ParseAssemblyInfo(sharedAssemblyInfo);
-  nancyVersion = assemblyInfo.AssemblyVersion;
-  Information("Version: {0}", nancyVersion);
-});
 
 ///////////////////////////////////////////////////////////////
 
@@ -154,8 +144,8 @@ Task("Package-NuGet")
   foreach(var project in projects)
   {
     var settings = new DotNetCorePackSettings {
-        Configuration = "Release",
-        OutputDirectory = outputNuGet
+      Configuration = "Release",
+      OutputDirectory = outputNuGet
     };
 
     DotNetCorePack(project.GetDirectory().FullPath, settings);
@@ -176,8 +166,8 @@ Task("Publish-NuGet")
   foreach(var package in packages)
   {
     NuGetPush(package, new NuGetPushSettings {
-        Source = source,
-        ApiKey = apiKey
+      Source = source,
+      ApiKey = apiKey
     });
   }
 });
@@ -185,40 +175,36 @@ Task("Publish-NuGet")
 ///////////////////////////////////////////////////////////////
 
 Task("Tag")
-    .Description("Tags the current release.")
-    .Does(() =>
+  .Description("Tags the current release.")
+  .Does(() =>
 {
   StartProcess("git", new ProcessSettings {
-      Arguments = string.Format("tag \"v{0}\"", nancyVersion)
+    Arguments = string.Format("tag \"v{0}\"", version)
   });
 });
 
 Task("Prepare-Release")
-    .Does(() =>
+  .Does(() =>
 {
   // Update version.
-  UpdateSharedAssemblyInfo(version, null);
+  UpdateProjectJsonVersion(version, projectJsonFiles);
 
   // Add
-  StartProcess("git", new ProcessSettings {
-      Arguments = string.Format("add {0}", sharedAssemblyInfo.Path.FullPath)
-  });
+  foreach (var file in projectJsonFiles) 
+  {
+    StartProcess("git", new ProcessSettings {
+      Arguments = string.Format("add {0}", file.FullPath)
+    });
+  }
+
   // Commit
   StartProcess("git", new ProcessSettings {
-      Arguments = string.Format("commit -m \"Updated version to {0}\"", version)
+    Arguments = string.Format("commit -m \"Updated version to {0}\"", version)
   });
   // Tag
   StartProcess("git", new ProcessSettings {
-      Arguments = string.Format("tag \"v{0}\"", version)
+    Arguments = string.Format("tag \"v{0}\"", version)
   });
-});
-
-///////////////////////////////////////////////////////////////
-
-Task("Update-Informational-Version")
-  .Does(() =>
-{
-  UpdateSharedAssemblyInfo(null, version);
 });
 
 Task("Update-Version")
@@ -227,34 +213,23 @@ Task("Update-Version")
   if(string.IsNullOrWhiteSpace(version)) {
     throw new CakeException("No version specified!");
   }
-  UpdateSharedAssemblyInfo(version, null);
+  
+  UpdateProjectJsonVersion(version, projectJsonFiles);
 });
 
 ///////////////////////////////////////////////////////////////
 
-public void UpdateSharedAssemblyInfo(string assemblyVersion, string informationalVersion)
+public void UpdateProjectJsonVersion(string version, FilePathCollection filePaths)
 {
-    // Make sure at least one version was specified.
-    if(string.IsNullOrWhiteSpace(version) && string.IsNullOrWhiteSpace(informationalVersion)) {
-        throw new CakeException("No version specified!");
-    }
-
-    // Parse the existing assembly info file.
-    var info = ParseAssemblyInfo(sharedAssemblyInfo);
-
-    // Create a new assembly info file.
-    CreateAssemblyInfo(sharedAssemblyInfo, new AssemblyInfoSettings {
-      Company = info.Company,
-      Copyright = info.Copyright,
-      Description = info.Description,
-      InformationalVersion = informationalVersion ?? info.AssemblyInformationalVersion,
-      Product = info.Product,
-      Title = info.Title,
-      Version = assemblyVersion ?? info.AssemblyVersion
-    });
+  Verbose(logAction => logAction("Setting version to {0}", version));
+  foreach (var file in filePaths) 
+  {
+    var projectJsonModel = DeserializeJsonFromFile<dynamic>(file.FullPath);
+    projectJsonModel.version = version;
+    SerializeJsonToFile(file.FullPath, projectJsonModel);
+  }
 }
 
-///////////////////////////////////////////////////////////////
 
 Task("Default")
   .IsDependentOn("Test")
