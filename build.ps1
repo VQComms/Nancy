@@ -15,9 +15,17 @@ Param(
 
 Function Install-Dotnet()
 {
-  $GlobalDotNetFound = &where.exe dotnet 2>&1 | Out-Null
+  $existingPaths = $Env:Path -Split ';' | Where-Object { (![string]::IsNullOrEmpty($_)) -and (Test-Path $_) }
+  $DOTNET_EXE_IN_PATH = (Get-ChildItem -Path $existingPaths -Filter "dotnet.exe" | Select -First 1).FullName
+  $GlobalDotNetFound =  (![string]::IsNullOrEmpty($DOTNET_EXE_IN_PATH)) -and (Test-Path $DOTNET_EXE_IN_PATH)
   $LocalDotNetFound = Test-Path (Join-Path $PSScriptRoot ".dotnet")
-  if((($GlobalDotNetFound -ne 0) -And !$LocalDotNetFound) -Or ((Test-Path Env:\APPVEYOR) -eq $true))
+
+  if ($GlobalDotNetFound)
+  {
+    return
+  }
+
+  if((!$LocalDotNetFound) -Or ((Test-Path Env:\APPVEYOR) -eq $true))
   {
     Write-Output "Dotnet CLI was not found."
 

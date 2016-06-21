@@ -1,4 +1,4 @@
-#addin "Cake.Json"
+#addin "Newtonsoft.Json"
 
 // Usings
 using System.Xml;
@@ -53,10 +53,12 @@ Task("Restore-NuGet-Packages")
     Verbose = false,
     Verbosity = DotNetCoreRestoreVerbosity.Warning
   };
-
-  DotNetCoreRestore("./src", settings);
-  DotNetCoreRestore("./samples", settings);
-  DotNetCoreRestore("./test", settings);
+  
+  //Restore at root until preview1-002702 bug fixed
+  DotNetCoreRestore("./", settings);
+  //DotNetCoreRestore("./src", settings);
+  //DotNetCoreRestore("./samples", settings);
+  //DotNetCoreRestore("./test", settings);
 });
 
 Task("Compile")
@@ -218,9 +220,12 @@ public void UpdateProjectJsonVersion(string version, FilePathCollection filePath
   Verbose(logAction => logAction("Setting version to {0}", version));
   foreach (var file in filePaths) 
   {
-    var projectJsonModel = DeserializeJsonFromFile<dynamic>(file.FullPath);
-    projectJsonModel.version = version;
-    SerializeJsonToFile(file.FullPath, projectJsonModel);
+    var project = Newtonsoft.Json.Linq.JObject.Parse(
+      System.IO.File.ReadAllText(file.FullPath, Encoding.UTF8));
+
+    project["version"].Replace(version);
+
+    System.IO.File.WriteAllText(file.FullPath, project.ToString(), Encoding.UTF8);
   }
 }
 
