@@ -24,6 +24,7 @@ var outputBinariesNet452 = outputBinaries + Directory("net452");
 var outputBinariesNetstandard = outputBinaries + Directory("netstandard1.5");
 var outputPackages = output + Directory("packages");
 var outputNuGet = output + Directory("nuget");
+var restoreDirectory = output + Directory("nugetrestore");
 
 ///////////////////////////////////////////////////////////////
 
@@ -33,7 +34,7 @@ Task("Clean")
   // Clean artifact directories.
   CleanDirectories(new DirectoryPath[] {
     output, outputBinaries, outputPackages, outputNuGet,
-    outputBinariesNet452, outputBinariesNetstandard
+    outputBinariesNet452, outputBinariesNetstandard, restoreDirectory
   });
 
   if(!skipClean) {
@@ -57,7 +58,8 @@ Task("Restore-NuGet-Packages")
         "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json",
         "https://dotnet.myget.org/F/cli-deps/api/v3/index.json",
         "https://api.nuget.org/v3/index.json",
-    }
+    },
+    PackagesDirectory = restoreDirectory
   };
   
   //Restore at root until preview1-002702 bug fixed
@@ -74,11 +76,19 @@ Task("Compile")
   .Does(() =>
 {
   var projects = GetFiles("./**/*.xproj");
+
+  if (IsRunningOnUnix())
+  {
+    projects = projects
+              - GetFiles("./**/Nancy.Encryption.MachineKey.xproj");
+  }
+
   foreach(var project in projects)
   {
     DotNetCoreBuild(project.GetDirectory().FullPath, new DotNetCoreBuildSettings {
       Configuration = configuration,
-      Verbose = false
+      Verbose = false,
+      Runtime = IsRunningOnWindows() ? null : "unix-x64"
     });
   }
 });
@@ -92,11 +102,39 @@ Task("Test")
   var projects = GetFiles("./test/**/*.xproj")
     - GetFiles("./test/**/Nancy.ViewEngines.Razor.Tests.Models.xproj");
 
+  if (IsRunningOnUnix())
+  {
+    projects = projects 
+              - GetFiles("./test/**/Nancy.Encryption.MachineKey.Tests.xproj")
+              - GetFiles("./test/**/Nancy.ViewEngines.DotLiquid.Tests.xproj");
+  }
+
   foreach(var project in projects)
   {
-    DotNetCoreTest(project.GetDirectory().FullPath, new DotNetCoreTestSettings {
-      Configuration = configuration
-    });
+    if (IsRunningOnWindows())
+    {
+      DotNetCoreTest(project.GetDirectory().FullPath, new DotNetCoreTestSettings {
+        Configuration = configuration
+      });
+    }
+    else 
+    {
+      // For when test projects are set to run against netstandard1.5 
+
+      // DotNetCoreTest(project.GetDirectory().FullPath, new DotNetCoreTestSettings {
+      //   Configuration = configuration,
+      //   Framework = "netstandard1.5",
+      //   Runtime = "unix-64"
+      // });
+
+      var dirPath = project.GetDirectory().FullPath;
+      var testFile = project.GetFilenameWithoutExtension();
+
+      StartProcess("mono", new ProcessSettings{Arguments = 
+        dirPath + "/bin/" + configuration + "/net452/unix-x64/dotnet-test-xunit.exe" + " " + 
+        dirPath + "/bin/" + configuration + "/net452/unix-x64/" + testFile + ".dll"
+      });
+    }
   }
 });
 
