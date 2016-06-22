@@ -27,22 +27,11 @@ for i in "$@"; do
 done
 
 function installdotnet() {
-  if [ ! $(dotnetinstalled dotnet) ]
-    then
+  if ! [ -x "$(command -v dotnet)" ] ; then
       echo "Installing dotnet"
-      apt-get install curl
       curl -sSL https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh | bash /dev/stdin --channel beta --version 1.0.0-preview1-002702 --install-dir .dotnet
       export PATH=.dotnet:$PATH
   fi
-}
-
-function dotnetinstalled() {
-  # set to 1 initially
-  local return_=1
-  # set to 0 if not found
-  type $1 >/dev/null 2>&1 || { local return_=0; }
-  # return value
-  echo "$return_"
 }
 
 function installcake() {
