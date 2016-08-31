@@ -1383,17 +1383,6 @@ namespace Nancy.Json.Simple
             
             bool valueIsLong = value is long;
             bool valueIsDouble = value is double;
-            if (type.GetTypeInfo().IsEnum)
-            {
-                 if (value is double || value is int || value is long)
-                 {
-                     return Enum.ToObject(type, Convert.ToInt32(value.ToString()));
-                 }
-                 else if (value is string)
-                 {
-                     return Enum.Parse(type, value.ToString());
-                 }
-            }
             if ((valueIsLong && type == typeof(long)) || (valueIsDouble && type == typeof(double)))
                 return value;
             if ((valueIsDouble && type != typeof(double)) || (valueIsLong && type != typeof(long)))
@@ -1479,7 +1468,7 @@ namespace Nancy.Json.Simple
 
         protected virtual object SerializeEnum(Enum p)
         {
-            return p.ToString();
+            return Convert.ToDouble(p, CultureInfo.InvariantCulture);
         }
 
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification="Need to support .NET 2")]
